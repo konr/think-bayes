@@ -69,3 +69,37 @@ Problem: does it matter which door to choose?"
                 => {:car-in-a 1
                     :car-in-b 0
                     :car-in-c 0}))) 
+
+
+(facts "on the M&Ms problem:
+
+- The proportion of colors of M&Ms in any given bag is given by its factory
+- In 1994 and 1996 there were different proportions
+
+Problem: If you start picking M&Ms from two different and unlabeled bags, can you tell which is from 1994 and which is from 1996?"
+       (let [prior-hypothesis {:bag-1-is-1994 1/2
+                               :bag-2-is-1994 1/2}
+             bags {:from-1996 {:blue 24
+                               :green 20
+                               :orange 16
+                               :yellow 14
+                               :red 13
+                               :brown 13}
+                   :from-1994 {:brown 30
+                               :yellow 20
+                               :red 20
+                               :green 10
+                               :orange 10
+                               :tan 10}}
+             hypotheses {:bag-1-is-1994 {:bag-1 (:from-1994 bags) :bag-2 (:from-1996 bags)}
+                         :bag-2-is-1994 {:bag-1 (:from-1996 bags) :bag-2 (:from-1994 bags)}}
+             with-event (fn [event prior] (core/bayes-rule
+                                           (fn [[bag color]] (map-vals #(get-in % event) hypotheses ))
+                                           prior event))]
+
+         (fact "book example"
+               (->> prior-hypothesis
+                    (with-event [:bag-1 :yellow])
+                    (with-event [:bag-2 :green]))
+               => {:bag-1-is-1994 20/27
+                   :bag-2-is-1994 7/27})))
