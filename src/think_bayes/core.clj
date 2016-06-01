@@ -1,7 +1,6 @@
 (ns think-bayes.core
   (:require [schema.core :as s]
-            [think-bayes.utils :refer [map-vals]]
-            [think-bayes.protocols :as pro]))
+            [think-bayes.utils :refer [map-vals]]))
 
 (def PmfType {s/Any BigDecimal})
 
