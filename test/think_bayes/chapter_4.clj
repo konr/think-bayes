@@ -2,6 +2,7 @@
   (:require  [midje.sweet :refer :all]
              [think-bayes.utils :refer [map-vals map-vals* mean p]]
              [think-bayes.prior :as prior]
+             [think-bayes.beta :as beta]
              [think-bayes.core :as core]))
 
 (facts "on the euro problem:
@@ -41,5 +42,11 @@ Strategy:
 
                    (core/maximum-likelyhood triangle-pmf) => 56
                    (core/mean triangle-pmf) => (roughly 55.75M 0.01)
-                   (core/median triangle-pmf) => 56)))))
+                   (core/median triangle-pmf) => 56))
+
+           (fact "using beta distribution"
+                   (-> beta/uniform-prior-beta
+                       (beta/with-events 140M 110M)
+                       beta/mean)
+                   => (roughly 0.56M 0.01)))))
 
