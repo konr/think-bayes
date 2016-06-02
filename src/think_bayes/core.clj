@@ -1,6 +1,6 @@
 (ns think-bayes.core
   (:require [schema.core :as s]
-            [think-bayes.utils :refer [map-vals]]))
+            [think-bayes.utils :refer [map-vals find-first]]))
 
 (def PmfType {s/Any BigDecimal})
 
@@ -18,7 +18,18 @@
 
 (s/defn bayes-rule
   "Updates, given a likelyhood function"
-  [likelyhood-function prior event]
+  [likelyhood-function :- s/fn-schema
+   prior :- PmfType
+   event :- s/Any]
   (->> (likelyhood-function event)
        (mult prior)
        normalize))
+
+(s/defn percentile
+  [threshold :- BigDecimal pmf :- PmfType]
+  (->>
+   pmf
+   (sort-by first)
+   (reductions (fn [[_ prob-acc] [val prob]] [val (+ prob-acc prob)]))
+   (find-first (fn [[val prob]] (< threshold prob)))
+   first))

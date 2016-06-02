@@ -1,6 +1,6 @@
 (ns think-bayes.chapter-3
   (:require  [midje.sweet :refer :all]
-             [think-bayes.utils :refer [map-vals map-vals* mean]]
+             [think-bayes.utils :refer [map-vals map-vals* mean p]]
              [think-bayes.prior :as prior]
              [think-bayes.core :as core]))
 
@@ -123,4 +123,14 @@ Problem: Estimate how many locomotives the railroad has."
           1000M              133M
           2000M              134M
           4000M              134M
-          8000M              134M)))
+          8000M              134M)
+
+         (fact "percentiles"
+               (->>
+                (-> (prior/discrete-power-law 1000M 1)
+                    (with-event 60M)
+                    (with-event 30M)
+                    (with-event 90M))
+                (with-precision 10)
+                ((juxt (p core/percentile 0.05M) (p core/percentile 0.95M))))
+               => [91 242])))

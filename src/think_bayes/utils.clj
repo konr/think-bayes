@@ -8,3 +8,8 @@
 
 (defn mean [list]
   (/ (apply + list) (count list)))
+
+(defn find-first [f s]
+  (first (filter f s)))
+
+(def p partial)
