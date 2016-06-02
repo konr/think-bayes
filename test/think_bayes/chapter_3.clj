@@ -1,6 +1,6 @@
 (ns think-bayes.chapter-3
   (:require  [midje.sweet :refer :all]
-             [think-bayes.utils :refer [map-vals map-vals* mean p]]
+             [think-bayes.utils :refer [map-vals map-vals* p]]
              [think-bayes.prior :as prior]
              [think-bayes.core :as core]))
 
@@ -55,7 +55,7 @@ Problem: What is the chance that you got each of the dice?"
 - One day you see a locomotive with the number 60.
 
 Problem: Estimate how many locomotives the railroad has."
-       (let [prior-hypothesis (prior/discrete 1000M)
+       (let [prior-hypothesis (prior/discrete 1 1001M)
              with-event (fn [prior event]
                           (core/bayes-rule
                            (fn [event] (map-vals* (fn [x y] (if (> event x) 0 (/ 1N x))) prior))
@@ -80,7 +80,7 @@ Problem: Estimate how many locomotives the railroad has."
           (fact "different prior upper bound"
                 (->>
                   (with-event
-                    (prior/discrete ?prior-upper-bound)
+                    (prior/discrete 1 (inc ?prior-upper-bound))
                     60M)
                  (with-precision 10)
                  (map (fn [[hyp prob]] (* hyp prob)))
@@ -94,7 +94,7 @@ Problem: Estimate how many locomotives the railroad has."
          (tabular 
           (fact "more observations, different prior upper bound"
                 (->>
-                 (-> (prior/discrete ?prior-upper-bound)
+                 (-> (prior/discrete 1 (inc ?prior-upper-bound))
                      (with-event 60M)
                      (with-event 30M)
                      (with-event 90M))
@@ -110,7 +110,7 @@ Problem: Estimate how many locomotives the railroad has."
          (tabular 
           (fact "using power law prior"
                 (->>
-                 (-> (prior/discrete-power-law ?prior-upper-bound 1)
+                 (-> (prior/discrete-power-law 1 (inc ?prior-upper-bound) 1)
                      (with-event 60M)
                      (with-event 30M)
                      (with-event 90M))
@@ -127,7 +127,7 @@ Problem: Estimate how many locomotives the railroad has."
 
          (fact "percentiles"
                (->>
-                (-> (prior/discrete-power-law 1000M 1)
+                (-> (prior/discrete-power-law 1 1001M 1)
                     (with-event 60M)
                     (with-event 30M)
                     (with-event 90M))

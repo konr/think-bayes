@@ -33,3 +33,17 @@
    (reductions (fn [[_ prob-acc] [val prob]] [val (+ prob-acc prob)]))
    (find-first (fn [[val prob]] (< threshold prob)))
    first))
+
+(s/defn maximum-likelyhood
+  [pmf :- PmfType]
+  (key (apply max-key second pmf)))
+
+(s/defn mean
+  [pmf :- PmfType]
+  (->> pmf
+       (map (fn [[hyp prob]] (* hyp prob)))
+       (apply +)))
+
+(s/defn median
+  [pmf :- PmfType]
+  (percentile 0.5M pmf))
